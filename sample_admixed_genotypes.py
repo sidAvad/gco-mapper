@@ -11,19 +11,26 @@ def keep_gco(gco_string,background_string,refs,alts,gcbias,coding_dict={'ref':'1
     gc_background=[refs[i] if x==coding_dict['ref'] else alts[i] for i,x in enumerate(background_string)]
    
     #Roll 70% dice if gco > background, else roll 30% dice
-    if sum([(x=='G') or (x=='C') for x in gc_gco]) >= sum([(x=='G') or (x=='C') for x in gc_background]):
+    if sum([(x=='G') or (x=='C') for x in gc_gco]) > sum([(x=='G') or (x=='C') for x in gc_background]):
         if random.random() < gcbias:
-            print('retaining gco : g/c content of transmitted allele >= g/c content of background')
+            print('retaining gco gc > : transmitted alleles = {} and recepient alleles = {}'.format(gc_gco,gc_background))
             return(True)
         else:
-            print('dropping gco : g/c content of transmitted allele >= g/c content of background')
+            print('dropping gco gc > : transmitted alleles = {} and recepient alleles = {}'.format(gc_gco,gc_background))
+            return(False)
+    elif sum([(x=='G') or (x=='C') for x in gc_gco]) == sum([(x=='G') or (x=='C') for x in gc_background]):
+        if random.random() < gcbias:
+            print('retaining gco gc == : transmitted alleles = {} and recepient alleles = {}'.format(gc_gco,gc_background))
+            return(True)
+        else:
+            print('dropping gco gc == : transmitted alleles = {} and recepient alleles = {}'.format(gc_gco,gc_background))
             return(False)
     else:
         if random.random() < (1-gcbias):
-            print('retaining gco : g/c content of transmitted allele < g/c content of background')
+            print('retaining gco gc < : transmitted alleles = {} and recepient alleles = {}'.format(gc_gco,gc_background))
             return(True)
         else:
-            print('dropping gco : g/c content of transmitted allele < g/c content of background')
+            print('dropping gco gc < : transmitted alleles = {} and recepient alleles = {}'.format(gc_gco,gc_background))
             return(False)
 
     
@@ -178,6 +185,8 @@ def main():
     parser.add_argument('-o', '--outprefix', required=True, help="output prefix for recomb only, recomb with gco")
     args = parser.parse_args()
     
+    random.seed(1000)
+
     Hap.read_data({'YRIfile':args.YRIfile, 'CEUfile':args.CEUfile, 'snpfile':args.snpfile})
     
     with open(args.recomb_bpfile) as f:
