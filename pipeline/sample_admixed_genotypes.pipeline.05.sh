@@ -2,7 +2,7 @@
 #SBATCH --partition regular,long7,long30
 #SBATCH --nodes 1
 #SBATCH --ntasks-per-node 1
-#SBATCH --mem-per-cpu 16G
+#SBATCH --mem-per-cpu 32G
 #SBATCH --job-name sample_admixed_genotypes
 #SBATCH --output logs/sample_admixed_genotypes.log
 

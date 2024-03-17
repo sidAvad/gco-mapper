@@ -17,12 +17,12 @@ size=5000
 source /home/sna53/miniconda3/bin/activate sciComp
 
 #unphase admixed file (convert phgeno to geno)
-python src/eig2eig.py $RSYNCDIR/simulated_data/300_individuals/admixed_w_backgroundgc_recomb_gco.phgeno
+python src/eig2eig.py $RSYNCDIR/simulated_data/100_individuals_testgc/admixed_w_backgroundgc_recomb_gco.phgeno
 
 #Create vcf from unphased admixed file
-python src/eig2vcf.py -r $RSYNCDIR/simulated_data/300_individuals/admixed_w_backgroundgc_recomb_gco \
+python src/eig2vcf.py -r $RSYNCDIR/simulated_data/100_individuals_testgc/admixed_w_backgroundgc_recomb_gco \
     -s $RSYNCDIR/source_data/backgroundgc/OOA4J17_YRI_chr1.sim.filt \
-    > $RSYNCDIR/simulated_data/300_individuals/admixed_w_backgroundgc_recomb_gco.vcf
+    > $RSYNCDIR/simulated_data/100_individuals_testgc/admixed_w_backgroundgc_recomb_gco.vcf
 
 half_size=$((size / 2))
 
@@ -43,7 +43,7 @@ selected_ceu_samples=$(cat "$CEU_samples" | shuf -n "$half_size" | tr '\n' ',')
     ${RSYNCDIR}/source_data/backgroundgc/CEU_phasingreference_${chr}_${size}.filt.vcf.gz \
     > ${RSYNCDIR}/source_data/backgroundgc/YRICEU_phasingreference_${chr}_${size}.filt.vcf
 
-file1=$RSYNCDIR/simulated_data/300_individuals/admixed_w_backgroundgc_recomb_gco.vcf
+file1=$RSYNCDIR/simulated_data/100_individuals_testgc/admixed_w_backgroundgc_recomb_gco.vcf
 file2=$RSYNCDIR/source_data/backgroundgc/YRICEU_phasingreference_${chr}_${size}.filt.vcf
 wc1=$(grep -v '^#' $file1 | wc -l)
 wc2=$(grep -v '^#' $file2 | wc -l)
@@ -54,13 +54,13 @@ echo "nlines file 1 = $wc1 and nlines file 2 = $wc2"
 java -jar beagle/beagle.22Jul22.46e.jar \
     gt=$file1 \
     ref=$file2 \
-    out=$RSYNCDIR/simulated_data/300_individuals/admixed_w_backgroundgc_recomb_gco_phased_${chr}_${size} \
+    out=$RSYNCDIR/simulated_data/100_individuals_testgc/admixed_w_backgroundgc_recomb_gco_phased_${chr}_${size} \
     map=$RSYNCDIR/reference/plink.GRCh37.map/plink.chr${chr}.GRCh37.map chrom=${chr} nthreads=16
 
 source $HOME/miniconda3/bin/activate
 python2 src/gdc/vcf2eigenstrat_phased.py \
-    -v $RSYNCDIR/simulated_data/300_individuals/admixed_w_backgroundgc_recomb_gco_phased_${chr}_${size}.vcf.gz \
-    -o $RSYNCDIR/simulated_data/300_individuals/admixed_w_backgroundgc_recomb_gco_phased_${chr}_${size}.phgeno
+    -v $RSYNCDIR/simulated_data/100_individuals_testgc/admixed_w_backgroundgc_recomb_gco_phased_${chr}_${size}.vcf.gz \
+    -o $RSYNCDIR/simulated_data/100_individuals_testgc/admixed_w_backgroundgc_recomb_gco_phased_${chr}_${size}.phgeno
 
 #Some code for bgzip and tabix
 #for file in {"${RSYNCDIR}/source_data/no_backgroundgc/YRI_phasingreference_${chr}_${size}.vcf","${RSYNCDIR}/source_data/no_backgroundgc/YRI_phasingreference_${chr}_${size}.vcf"}
