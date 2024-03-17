@@ -332,14 +332,12 @@ def modify_subadmixStrings(s):
 
     return(modified_strings)
 
-def generateAdmixStrings(t1,t2,p1,p2,n=2,options=['n','n'],seed=1000):
+def generateAdmixStrings(t1,t2,p1,p2,n=2,options=['n','n']):
     '''
     Function that generates admixture strings for both branches with admixture occuring t1 and t2 generations ago respectively. Option list contains 'n' for normal and 's' for subadmix. There's one option for each branch
     '''
     #{{{ 
     
-    random.seed(seed)
-
     if options[0] == 'n':
         strings_l = generateAdmixStrings_branch(t1,p1,n) 
     elif options[0] == 's':

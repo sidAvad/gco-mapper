@@ -7,23 +7,33 @@ import argparse
 import random
 
 def keep_gco(gco_string,background_string,refs,alts,gcbias,coding_dict={'ref':'1','alt':'0'}):
+    assert len(gco_string) == len(refs)
+    assert len(gco_string) == len(alts)
+    
     gc_gco=[refs[i] if x==coding_dict['ref'] else alts[i] for i,x in enumerate(gco_string)]
     gc_background=[refs[i] if x==coding_dict['ref'] else alts[i] for i,x in enumerate(background_string)]
    
     #Roll 70% dice if gco > background, else roll 30% dice
-    if sum([(x=='G') or (x=='C') for x in gc_gco]) >= sum([(x=='G') or (x=='C') for x in gc_background]):
+    if sum([(x=='G') or (x=='C') for x in gc_gco]) > sum([(x=='G') or (x=='C') for x in gc_background]):
         if random.random() < gcbias:
-            print('retaining gco : g/c content of transmitted allele >= g/c content of background')
+            print('retaining gco gc > : transmitted alleles = {} and recepient alleles = {}'.format(gc_gco,gc_background))
             return(True)
         else:
-            print('dropping gco : g/c content of transmitted allele >= g/c content of background')
+            print('dropping gco gc > : transmitted alleles = {} and recepient alleles = {}'.format(gc_gco,gc_background))
+            return(False)
+    elif sum([(x=='G') or (x=='C') for x in gc_gco]) == sum([(x=='G') or (x=='C') for x in gc_background]):
+        if random.random() < gcbias:
+            print('retaining gco gc == : transmitted alleles = {} and recepient alleles = {}'.format(gc_gco,gc_background))
+            return(True)
+        else:
+            print('dropping gco gc == : transmitted alleles = {} and recepient alleles = {}'.format(gc_gco,gc_background))
             return(False)
     else:
         if random.random() < (1-gcbias):
-            print('retaining gco : g/c content of transmitted allele < g/c content of background')
+            print('retaining gco gc < : transmitted alleles = {} and recepient alleles = {}'.format(gc_gco,gc_background))
             return(True)
         else:
-            print('dropping gco : g/c content of transmitted allele < g/c content of background')
+            print('dropping gco gc < : transmitted alleles = {} and recepient alleles = {}'.format(gc_gco,gc_background))
             return(False)
 
     
@@ -107,8 +117,8 @@ class Hap():
         """
         splice in gene-conversions after generating admixed recombinant genotype
         """
-        refs=self.snp_table['ref'].tolist()
-        alts=self.snp_table['alt'].tolist()
+        refs_all=self.snp_table['ref'].tolist()
+        alts_all=self.snp_table['alt'].tolist()
         if not self.admix_line:
             print("please run .sample(admixstring) fist")
             exit()
@@ -121,6 +131,8 @@ class Hap():
                 sample_id=self.YRI_map.index(hap_id)
                 write_string=self.YRI_lines[sample_id][int(gco['start_marker'])-1:int(gco['end_marker'])] #this way of indexing ensures start and end marker inclusive
                 replace_string=self.admix_line_w_gcos[int(gco['start_marker'])-1:int(gco['end_marker'])]
+                refs,alts=refs_all[int(gco['start_marker'])-1:int(gco['end_marker'])],alts_all[int(gco['start_marker'])-1:int(gco['end_marker'])] 
+                
                 if keep_gco(write_string,replace_string,refs,alts,gcbias):
                     diff_marker_nos=[int(gco['start_marker'])+i for i in range(len(write_string)) \
                             if write_string[i]!=replace_string[i]]
@@ -136,6 +148,8 @@ class Hap():
                 sample_id=self.CEU_map.index(hap_id)
                 write_string=self.CEU_lines[sample_id][int(gco['start_marker'])-1:int(gco['end_marker'])]
                 replace_string=self.admix_line_w_gcos[int(gco['start_marker'])-1:int(gco['end_marker'])]
+                refs,alts=refs_all[int(gco['start_marker'])-1:int(gco['end_marker'])],alts_all[int(gco['start_marker'])-1:int(gco['end_marker'])] 
+                
                 if keep_gco(write_string,replace_string,refs,alts,gcbias):
                     diff_marker_nos=[int(gco['start_marker'])+i for i in range(len(write_string)) \
                             if write_string[i]!=replace_string[i]]
@@ -178,6 +192,8 @@ def main():
     parser.add_argument('-o', '--outprefix', required=True, help="output prefix for recomb only, recomb with gco")
     args = parser.parse_args()
     
+    random.seed(1000)
+
     Hap.read_data({'YRIfile':args.YRIfile, 'CEUfile':args.CEUfile, 'snpfile':args.snpfile})
     
     with open(args.recomb_bpfile) as f:

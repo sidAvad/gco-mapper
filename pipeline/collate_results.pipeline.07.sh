@@ -6,17 +6,17 @@
 #SBATCH --exclude=cbsubscb18
 #SBATCH --job-name collate_results
 #SBATCH --output logs/collate_results.%a.log
-##SBATCH --array=1-3
+#SBATCH --array=1-5
 
-#counter=1
-#for window_size in {25000,50000,100000}
-#do
-#    if [ $counter -eq $SLURM_ARRAY_TASK_ID ]
-#    then
-#        break
-#    fi
-#    counter=$((counter+1))
-#done
-window_size=200000
+counter=1
+for window_size in {25000,50000,100000,200000,500000}
+do
+    if [ $counter -eq $SLURM_ARRAY_TASK_ID ]
+    then
+        break
+    fi
+    counter=$((counter+1))
+done
+#window_size=100000
 source /home/sna53/miniconda3/bin/activate sciComp
-python src/collate_results.py 300 $window_size
+python src/collate_results.py 200 $window_size
