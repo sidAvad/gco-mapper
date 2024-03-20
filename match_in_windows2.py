@@ -88,6 +88,9 @@ class windows():
                     'edit_distance':dist_best, \
                     'exact_matches':[x.vector for x in exact_matches]\
                     })
+
+
+
 class Scanner():
     """
     class that holds data for doing string matching and inference
@@ -117,7 +120,8 @@ class Scanner():
                 ,'matches':match['matches'],'edit_distance':match['edit_distance'],'exact_matches':match['exact_matches']})
             results.append(results_window)
 
-        self.results=[list(i) for i in zip(*results)] #This tranposed list of lists contains an element for a admixed genotype across all windows
+        self.results_transposed=[list(i) for i in zip(*results)] #This tranposed list of lists contains an element for a admixed genotype across all windows
+
 
     def close_data(self):
         self.Y.close()
@@ -125,7 +129,7 @@ class Scanner():
         self.A.close()
 
     def write(self,outprefix):
-        for i,result in enumerate(self.results):#loop over each admixed individual
+        for i,result in enumerate(self.results_transposed):#loop over each admixed individual
             outfile=outprefix+'_hap{}'.format(i+1)+'.txt'
             result_df=pd.DataFrame(result)
             result_df.to_csv(outfile,sep='\t',index=False)
@@ -144,7 +148,7 @@ def main():
     scanner.open_data({'YRIfile':args.YRIfile, 'CEUfile':args.CEUfile, 'admixedfile':args.admixed_file, 'snpfile':args.snpfile})
     scanner.scan()
     scanner.close_data()
-    scanner.write(args.output_prefix)
-    
+    scanner.write_matches(args.output_prefix)
+
 if __name__ == "__main__":
     main()

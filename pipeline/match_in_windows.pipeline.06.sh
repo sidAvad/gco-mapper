@@ -44,12 +44,19 @@ else
     echo "Line counts are not equal."
 fi
 
+#python -m src.match_in_windows2 -a $admixedfile \
+#    -w $window_size \
+#    -Y $YRIfile \
+#    -C $CEUfile \
+#    -s $snpfile -o rsync_data/matches/100_individuals_testgc/matches_wbackgroundgc_windowsize${window_size}
+
 SECONDS=0
-python -m src.match_in_windows2 -a $admixedfile \
-    -w $window_size \
+python -m src.sub_match -W results/100_individuals_testgc/results_windowsize200000.txt \
+    -w 100000 \
     -Y $YRIfile \
     -C $CEUfile \
-    -s $snpfile -o rsync_data/matches/100_individuals_testgc/matches_wbackgroundgc_windowsize${window_size}
+    -s $snpfile \
+    -o testout.txt
 
 duration=$SECONDS
 echo "$(($duration/60)) minutes and $(($duration % 60)) seconds elapsed."
